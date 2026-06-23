@@ -11,21 +11,28 @@ import { FormField } from "../../components/forms/FormField";
 import { PasswordInput } from "../../components/forms/PasswordInput";
 import { signupSchema, type SignupFormData } from "../../lib/validation/authSchemas";
 import { Link } from "react-router-dom";
+import { useSignup } from "../../lib/hooks/useAuth";
+import { FormError } from "../../components/forms/FormError";
 
 export function SignupPage() {
+  const { mutate: signup, isPending, isError, error } = useSignup();
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors},
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
   // Stub submit — real API call comes Day 3
-  const onSubmit = async (data: SignupFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    console.log("Signup submitted:", data);
-  };
+  const onSubmit = (data: SignupFormData) => {
+  signup({
+    fullName: data.fullName,
+    email: data.email,
+    password: data.password,
+  });
+};
 
   return (
     <SplitAuthScreen
@@ -35,11 +42,11 @@ export function SignupPage() {
             Your second brain, powered by AI
           </h2>
           <p className="text-slate-400 mt-4 max-w-sm">
-            Upload documents, ask questions, and let NexusMind surface the knowledge you need — instantly.
+            Upload documents, ask questions, and let CiteDocs surface the knowledge you need — instantly.
           </p>
           <div className="mt-8">
             <AvatarStack />
-            <p className="text-slate-400 text-sm mt-3">Join 12,000+ teams already using NexusMind</p>
+            <p className="text-slate-400 text-sm mt-3">Join 12,000+ teams already using CiteDocs</p>
           </div>
         </div>
       }
@@ -52,7 +59,13 @@ export function SignupPage() {
       <div className="mt-6">
         <GoogleButton onClick={() => console.log("Google OAuth - wired Day 3")} />
         <Divider text="or sign up with email" />
-
+        {isError && (
+            <FormError
+              message={
+                (error as any)?.response?.data?.message || "Something went wrong. Please try again."
+              }
+            />
+          )}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormField
             label="Full name"
@@ -86,7 +99,7 @@ export function SignupPage() {
 
           <motion.button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isPending}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -94,7 +107,7 @@ export function SignupPage() {
                       font-semibold rounded-lg py-2.5 hover:opacity-90 transition-opacity
                       disabled:opacity-50 mt-2"
           >
-            {isSubmitting ? "Creating account..." : "Create Account"}
+            {isPending ? "Creating account..." : "Create Account"}
           </motion.button>
         </form>
 

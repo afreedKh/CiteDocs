@@ -13,21 +13,23 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { loginSchema } from "../../lib/validation/authSchemas";
 import type { LoginFormData } from "../../lib/validation/authSchemas";
 import { Link } from "react-router-dom";
+import { useLogin } from "../../lib/hooks/useAuth";
+import { FormError } from "../../components/forms/FormError";
 
 export function LoginPage() {
-  const {
+  const { mutate: login, isPending, isError, error } = useLogin();
+ const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-  });
+  })
 
-  // Stub submit — real API call comes Day 3 once Dev A's auth endpoint is ready
-  const onSubmit = async (data: LoginFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 800)); // fake network delay
-    console.log("Login submitted:", data);
-  };
+
+  const onSubmit = (data: LoginFormData) => {
+  login({ email: data.email, password: data.password });
+};
 
   return (
     <SplitAuthScreen
@@ -67,7 +69,13 @@ export function LoginPage() {
       <div className="mt-6">
         <GoogleButton onClick={() => console.log("Google OAuth - wired Day 3")} />
         <Divider text="or continue with email" />
-
+          {isError && (
+            <FormError
+              message={
+                (error as any)?.response?.data?.message || "Invalid email or password"
+              }
+            />
+          )}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormField
             label="Email address"
@@ -93,7 +101,7 @@ export function LoginPage() {
 
           <motion.button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isPending}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -101,7 +109,7 @@ export function LoginPage() {
                       font-semibold rounded-lg py-2.5 hover:opacity-90 transition-opacity
                       disabled:opacity-50"
           >
-            {isSubmitting ? "Signing in..." : "Sign in to CiteDocs"}
+            {isPending ? "Signing in..." : "Sign in to CiteDocs"}
           </motion.button>
         </form>
 
