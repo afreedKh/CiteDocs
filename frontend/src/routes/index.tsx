@@ -4,18 +4,20 @@ import { ProtectedRoute } from "./ProtectedRoute";
 import { LoginPage } from "../pages/auth/LoginPage";
 import { SignupPage } from "../pages/auth/SignupPage";
 import { DashboardPage } from "../pages/dashboard/DashboardPage";
+import { DocumentsPage } from "../pages/documents/DocumentsPage";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
   { path: "/signup", element: <SignupPage /> },
   {
-    element: <ProtectedRoute />,      // auth guard
+    element: <ProtectedRoute />,
     children: [
       {
-        element: <AppLayout />,       // shared shell for logged-in pages
+        element: <AppLayout />,
         children: [
-          { path: "/dashboard", element: <DashboardPage /> },
           { path: "/", element: <DashboardPage /> },
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/documents", element: <DocumentsPage /> },
         ],
       },
     ],
