@@ -39,8 +39,6 @@ export const registerUser = async (
       email,
       password: hashedPassword
     }).save();
-    
-    console.log("User created:", user); // Log the created user for debugging
 
     res.status(201).json({
       id: user._id,
