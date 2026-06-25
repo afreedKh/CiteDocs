@@ -1,3 +1,6 @@
+import { useState, useRef, useEffect } from "react";
+import { LogOut } from "lucide-react";
+import { useLogout } from "../../lib/hooks/useAuth";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard, Folders, FileText, Users,
@@ -36,6 +39,20 @@ const navSections = [
 
 export function Sidebar() {
   const { user } = useAuthStore();
+  const { mutate: logout } = useLogout();     // ← add
+  const [userMenuOpen, setUserMenuOpen] = useState(false);  // ← add
+  const menuRef = useRef<HTMLDivElement>(null);   // ← add
+
+  // Close dropdown when clicking outside  ← add this block
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <aside className="w-[240px] shrink-0 h-screen flex flex-col bg-white border-r 
@@ -142,18 +159,53 @@ export function Sidebar() {
         </div>
 
         {/* User */}
-        <div className="flex items-center gap-2 px-3 py-2">
-          <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center 
-                          justify-center text-white text-xs font-semibold">
-            {user?.fullName?.charAt(0) ?? "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-slate-900 truncate">
-              {user?.fullName ?? "User"}
-            </p>
-            <p className="text-[10px] text-slate-400">Pro Plan</p>
-          </div>
-          <ChevronDown size={12} className="text-slate-400" />
+        {/* User — replace the existing user div with this */}
+        <div className="relative">
+          <button
+            onClick={() => setUserMenuOpen((v) => !v)}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg 
+                      hover:bg-slate-100 transition-colors"
+          >
+            <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center 
+                            justify-center text-white text-xs font-semibold shrink-0">
+              {user?.fullName?.charAt(0) ?? "U"}
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-xs font-medium text-slate-900 truncate">
+                {user?.fullName ?? "User"}
+              </p>
+              <p className="text-[10px] text-slate-400">Pro Plan</p>
+            </div>
+            <ChevronDown
+              size={12}
+              className={`text-slate-400 transition-transform 
+                          ${userMenuOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {/* Dropdown */}
+          {userMenuOpen && (
+            <div
+              ref={menuRef}
+              className="absolute bottom-full left-0 w-full mb-1 bg-white border 
+                        border-slate-200 rounded-xl shadow-lg overflow-hidden"
+            >
+              <div className="px-3 py-2.5 border-b border-slate-100">
+                <p className="text-xs font-medium text-slate-900">
+                  {user?.fullName}
+                </p>
+                <p className="text-[10px] text-slate-400">{user?.email}</p>
+              </div>
+              <button
+                onClick={() => logout()}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-sm 
+                          text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <LogOut size={14} />
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </aside>

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { loginApi, signupApi, logoutApi, type LoginPayload, type SignupPayload } from "../api/auth";
+import { loginApi, signupApi, logoutApi, type LoginPayload, type SignupPayload, type AuthUser } from "../api/auth";
 import { useAuthStore } from "../store/authStore";
 
 export function useLogin() {
@@ -10,7 +10,12 @@ export function useLogin() {
   return useMutation({
     mutationFn: (payload: LoginPayload) => loginApi(payload),
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
+      const user: AuthUser = {
+        id: data.id,
+        fullName: data.fullName,
+        email: data.email,
+      };
+      setAuth(user, data.token);
       navigate("/dashboard");
     },
     onError: (error: any) => {
@@ -26,7 +31,12 @@ export function useSignup() {
   return useMutation({
     mutationFn: (payload: SignupPayload) => signupApi(payload),
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
+      const user: AuthUser = {
+        id: data.id,
+        fullName: data.fullName,
+        email: data.email,
+      };
+      setAuth(user, data.token);
       navigate("/dashboard");
     },
     onError: (error: any) => {

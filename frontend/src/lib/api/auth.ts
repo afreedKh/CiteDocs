@@ -7,9 +7,10 @@ export interface AuthUser {
 }
 
 export interface AuthResponse {
-  user: AuthUser;
-  accessToken: string;
-  refreshToken: string;
+  id: string;
+  fullName: string;
+  email: string;
+  token: string; 
 }
 
 export interface LoginPayload {
@@ -29,7 +30,7 @@ export async function loginApi(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function signupApi(payload: SignupPayload): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>("/auth/signup", payload);
+  const { data } = await apiClient.post<AuthResponse>("/auth/register", payload);
   return data;
 }
 

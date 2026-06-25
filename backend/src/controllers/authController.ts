@@ -34,11 +34,13 @@ export const registerUser = async (
       10
     );
 
-    const user = await User.create({
+    const user = await new User({
       fullName,
       email,
       password: hashedPassword
-    });
+    }).save();
+    
+    console.log("User created:", user); // Log the created user for debugging
 
     res.status(201).json({
       id: user._id,
