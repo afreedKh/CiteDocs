@@ -55,13 +55,13 @@ export function Sidebar() {
   }, []);
 
   return (
-    <aside className="w-[240px] shrink-0 h-screen flex flex-col bg-white border-r 
+    <aside className="w-60 shrink-0 h-screen flex flex-col bg-white border-r 
                       border-slate-100 overflow-y-auto">
 
       {/* Logo + workspace */}
       <div className="px-4 py-4 flex items-center justify-between border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-600 
                           to-purple-600 flex items-center justify-center">
             <Brain size={16} className="text-white" />
           </div>
@@ -150,7 +150,7 @@ export function Sidebar() {
             <span className="text-xs text-slate-500">7.4k / 10k</span>
           </div>
           <div className="h-1.5 bg-white rounded-full overflow-hidden">
-            <div className="h-full w-[74%] bg-gradient-to-r from-indigo-500 
+            <div className="h-full w-[74%] bg-linear-to-r from-indigo-500 
                             to-purple-500 rounded-full" />
           </div>
           <button className="text-xs text-indigo-600 font-medium mt-1.5">
