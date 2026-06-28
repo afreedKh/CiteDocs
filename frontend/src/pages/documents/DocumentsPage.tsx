@@ -52,7 +52,7 @@ export function DocumentsPage() {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
           className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white 
-                     bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg"
+                     bg-linear-to-r from-indigo-600 to-purple-600 rounded-lg"
         >
           <Upload size={15} />
           Upload Document
