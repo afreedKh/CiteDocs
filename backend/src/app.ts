@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/authRoute";
+import routes from "./routes/index.routes";
+import { errorHandler } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(
 
 app.use(express.json());
 
-app.use("/api/auth", authRoutes);
+app.use("/api/v1", routes);
+app.use(errorHandler);
 
 export default app;
