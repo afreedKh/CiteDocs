@@ -1,4 +1,4 @@
-import { comparePassword, hashPassword } from "../../utils/password";
+import { comparePassword, hashPassword } from "../../utils/encyption";
 import { generateToken } from "../../utils/token";
 import { findUserByEmail, saveNewUser } from "./auth.repository";
 import { LoginDTO, RegisterDTO } from "./auth.types";
