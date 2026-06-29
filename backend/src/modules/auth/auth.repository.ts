@@ -18,3 +18,11 @@ export const saveNewUser = async (
 
   return user;
 };
+
+export const verifyUserEmail = async (userId: string) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    { isEmailVerified: true },
+    { new: true },
+  );
+};

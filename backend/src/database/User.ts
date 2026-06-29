@@ -4,6 +4,7 @@ export interface IUser extends Document {
   fullName: string;
   email: string;
   password: string;
+  isEmailVerified: boolean;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -21,6 +22,10 @@ const userSchema = new mongoose.Schema<IUser>(
       type: String,
       required: true,
     },
+    isEmailVerified:{
+      type: Boolean,
+      default: false
+    }
   },
   {
     timestamps: true,

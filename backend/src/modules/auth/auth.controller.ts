@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { loginService, registerService } from "./auth.service";
+import { loginService, registerService, verifySignupOTP } from "./auth.service";
 
 export const registerController = async (
   req: Request,
@@ -13,7 +13,6 @@ export const registerController = async (
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      token: user.token,
     });
   } catch (error) {
     next(error);
@@ -29,6 +28,25 @@ export const loginController = async (
     const user = await loginService(req.body);
 
     res.json({
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email,
+      token: user.token,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifySignupOTPController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const user = await verifySignupOTP(req.body);
+
+    res.status(200).json({
       id: user.id,
       fullName: user.fullName,
       email: user.email,

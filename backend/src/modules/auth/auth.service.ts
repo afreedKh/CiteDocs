@@ -1,7 +1,8 @@
 import { comparePassword, hashPassword } from "../../utils/encyption";
 import { generateToken } from "../../utils/token";
+import { generateAndSendOTP, verifyOtp } from "../otp/otp.service";
 import { findUserByEmail, saveNewUser } from "./auth.repository";
-import { LoginDTO, RegisterDTO } from "./auth.types";
+import { LoginDTO, RegisterDTO, VerifySignupOtpType } from "./auth.types";
 
 const authError = (message: string) => {
   const err: any = new Error(message);
@@ -20,13 +21,20 @@ export const registerService = async (payload: RegisterDTO) => {
 
   const user = await saveNewUser(payload, hashedPassword);
 
-  const token = generateToken(user._id.toString());
+  const otpSent = await generateAndSendOTP({
+    userId: user._id,
+    email: user.email,
+    purpose: "signup",
+  });
+
+  if (!otpSent) {
+    throw authError("Otp sent failed");
+  }
 
   return {
     id: user._id,
     fullName: user.fullName,
     email: user.email,
-    token,
   };
 };
 
@@ -37,10 +45,24 @@ export const loginService = async (payload: LoginDTO) => {
     throw authError("Invalid email or password");
   }
 
+  if (!user.isEmailVerified) {
+    throw authError("Please verify your email first");
+  }
+
   const isMatch = await comparePassword(payload.password, user.password);
 
   if (!isMatch) {
     throw authError("Invalid email or password");
+  }
+
+  const otpSent = await generateAndSendOTP({
+    userId: user._id,
+    email: user.email,
+    purpose: "login",
+  });
+
+  if (!otpSent) {
+    throw authError("Otp sent failed");
   }
 
   const token = generateToken(user._id.toString());
@@ -52,3 +74,27 @@ export const loginService = async (payload: LoginDTO) => {
     token,
   };
 };
+
+export const verifySignupOTP = async (payload: VerifySignupOtpType) => {
+  const user = await findUserByEmail(payload.email);
+
+  if (!user) {
+    throw authError("User not found");
+  }
+
+  await verifyOtp({
+    userId: user._id,
+    enteredOTP: payload.otp,
+    purpose: "signup",
+  });
+
+  const token = generateToken(user._id.toString());
+
+  return {
+    id: user._id,
+    fullName: user.fullName,
+    email: user.email,
+    token,
+  };
+};
+
