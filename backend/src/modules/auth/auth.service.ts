@@ -1,8 +1,13 @@
 import { comparePassword, hashPassword } from "../../utils/encyption";
-import { generateToken } from "../../utils/token";
+import { getAccessToken, getRefreshToken } from "../../utils/token";
 import { generateAndSendOTP, verifyOtp } from "../otp/otp.service";
 import { findUserByEmail, saveNewUser } from "./auth.repository";
-import { LoginDTO, RegisterDTO, VerifySignupOtpType } from "./auth.types";
+import {
+  LoginDTO,
+  RegisterDTO,
+  VerifyLoginOtpType,
+  VerifySignupOtpType,
+} from "./auth.types";
 
 const authError = (message: string) => {
   const err: any = new Error(message);
@@ -65,13 +70,10 @@ export const loginService = async (payload: LoginDTO) => {
     throw authError("Otp sent failed");
   }
 
-  const token = generateToken(user._id.toString());
-
   return {
     id: user._id,
     fullName: user.fullName,
     email: payload.email,
-    token,
   };
 };
 
@@ -88,7 +90,7 @@ export const verifySignupOTP = async (payload: VerifySignupOtpType) => {
     purpose: "signup",
   });
 
-  const token = generateToken(user._id.toString());
+  const token = getAccessToken(user._id.toString());
 
   return {
     id: user._id,
@@ -98,3 +100,26 @@ export const verifySignupOTP = async (payload: VerifySignupOtpType) => {
   };
 };
 
+export const verifyLoginOTP = async (payload: VerifyLoginOtpType) => {
+  const user = await findUserByEmail(payload.email);
+  if (!user) {
+    throw authError("User not found");
+  }
+
+  await verifyOtp({
+    userId: user._id,
+    enteredOTP: payload.otp,
+    purpose: "login",
+  });
+
+  const accessToken = getAccessToken(user._id.toString());
+  const refreshToken = getRefreshToken(user._id.toString());
+
+  return {
+    id: user._id,
+    fullName: user.fullName,
+    email: payload.email,
+    accessToken,
+    refreshToken,
+  };
+};

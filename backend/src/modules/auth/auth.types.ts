@@ -13,3 +13,5 @@ export interface VerifySignupOtpType{
   email:string;
   otp:string;
 }
+
+export interface VerifyLoginOtpType extends VerifySignupOtpType {}
