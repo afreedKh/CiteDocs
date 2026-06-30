@@ -13,8 +13,12 @@ export type findLatestOTPType = Pick<IOtp, "purpose" | "userId">;
 
 export type deleteOtpType = Pick<IOtp, "purpose" | "userId">;
 
-export type generateAndSendOTPTypes = Pick<IOtp, 'userId' | 'purpose'> & {email:string};
+export type generateAndSendOTPTypes = Pick<IOtp, "userId" | "purpose"> & {
+  email: string;
+};
 
-export type verifyOtpType = Pick<IOtp, 'userId' | 'purpose'>& {enteredOTP:string}
+export type verifyOtpType = Pick<IOtp, "userId" | "purpose"> & {
+  enteredOTP: string;
+};
 
-export type deleteAllOTPType = IOtp['userId']
+export type deleteAllOTPType = IOtp["userId"];

@@ -1,5 +1,10 @@
 import Otp from "../../database/Otp";
-import { deleteAllOTPType, deleteOtpType, findLatestOTPType, IOtp } from "./otp.types";
+import {
+  deleteAllOTPType,
+  deleteOtpType,
+  findLatestOTPType,
+  IOtp,
+} from "./otp.types";
 
 export const createOTP = async ({
   userId,
@@ -7,7 +12,7 @@ export const createOTP = async ({
   purpose,
   expiredAt,
 }: IOtp) => {
-  return await new Otp({ userId, otpHash, purpose, expiredAt });
+  return await new Otp({ userId, otpHash, purpose, expiredAt }).save();
 };
 
 export const findLatestOTP = async ({ userId, purpose }: findLatestOTPType) => {

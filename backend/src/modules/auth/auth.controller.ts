@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  forgotPasswordService,
   loginService,
   registerService,
+  resetPasswordService,
+  verifyForgotPasswordOTP,
   verifyLoginOTP,
   verifySignupOTP,
 } from "./auth.service";
@@ -54,7 +57,8 @@ export const verifySignupOTPController = async (
       id: user.id,
       fullName: user.fullName,
       email: user.email,
-      token: user.token,
+      accessToken: user.accessToken,
+      refreshToken: user.refreshToken,
     });
   } catch (error) {
     next(error);
@@ -75,6 +79,46 @@ export const verifyLoginOTPController = async (
       accessToken: user.accessToken,
       refreshToken: user.refreshToken,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPasswordController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    await forgotPasswordService(req.body);
+    res
+      .status(200)
+      .json({ message: "If that email exists, an OTP has been sent" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyForgotPasswordOTPController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { resetToken } = await verifyForgotPasswordOTP(req.body);
+    res.status(200).json({ resetToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPasswordController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    await resetPasswordService(req.body);
   } catch (error) {
     next(error);
   }

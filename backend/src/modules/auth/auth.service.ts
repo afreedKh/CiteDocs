@@ -1,10 +1,22 @@
 import { comparePassword, hashPassword } from "../../utils/encyption";
-import { getAccessToken, getRefreshToken } from "../../utils/token";
-import { generateAndSendOTP, verifyOtp } from "../otp/otp.service";
-import { findUserByEmail, saveNewUser } from "./auth.repository";
 import {
+  getAccessToken,
+  getRefreshToken,
+  getResetToken,
+  verifyResetToken,
+} from "../../utils/token";
+import { generateAndSendOTP, verifyOtp } from "../otp/otp.service";
+import {
+  findUserByEmail,
+  saveNewUser,
+  verifyUserEmail,
+} from "./auth.repository";
+import {
+  ForgotPasswordType,
   LoginDTO,
   RegisterDTO,
+  ResetPasswordType,
+  VerifyForgotPasswordOTPType,
   VerifyLoginOtpType,
   VerifySignupOtpType,
 } from "./auth.types";
@@ -90,13 +102,17 @@ export const verifySignupOTP = async (payload: VerifySignupOtpType) => {
     purpose: "signup",
   });
 
-  const token = getAccessToken(user._id.toString());
+  await verifyUserEmail(user._id.toString());
+
+  const accessToken = getAccessToken(user._id.toString());
+  const refreshToken = getRefreshToken(user._id.toString());
 
   return {
     id: user._id,
     fullName: user.fullName,
     email: user.email,
-    token,
+    accessToken,
+    refreshToken,
   };
 };
 
@@ -122,4 +138,47 @@ export const verifyLoginOTP = async (payload: VerifyLoginOtpType) => {
     accessToken,
     refreshToken,
   };
+};
+
+export const forgotPasswordService = async (payload: ForgotPasswordType) => {
+  const user = await findUserByEmail(payload.email);
+  if (!user) {
+    return true;
+  }
+
+  const otpSent = await generateAndSendOTP({
+    userId: user._id,
+    email: user.email,
+    purpose: "forgot-password",
+  });
+
+  if (!otpSent) {
+    throw authError("Otp sent failed");
+  }
+
+  return true;
+};
+
+export const verifyForgotPasswordOTP = async (
+  payload: VerifyForgotPasswordOTPType,
+) => {
+  const user = await findUserByEmail(payload.email);
+
+  if (!user) {
+    throw authError("User not found");
+  }
+
+  await verifyOtp({
+    userId: user._id,
+    enteredOTP: payload.otp,
+    purpose: "forgot-password",
+  });
+
+  const resetToken = getResetToken(user._id.toString());
+
+  return { resetToken };
+};
+
+export const resetPasswordService = async (payload: ResetPasswordType) => {
+  const { id } = verifyResetToken(payload.resetToken);
 };

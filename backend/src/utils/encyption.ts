@@ -15,7 +15,7 @@ export const hashOtp = async (otp: string) => {
   return hashedOtp;
 };
 
-export const compareOTP  = async (enteredOtp: string, dbOTP:string ) => {
+export const compareOTP = async (enteredOtp: string, dbOTP: string) => {
   const isMatched = await bcrypt.compare(enteredOtp, dbOTP);
   return isMatched;
 };
