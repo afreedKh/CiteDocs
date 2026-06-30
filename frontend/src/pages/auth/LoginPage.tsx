@@ -18,43 +18,42 @@ import { FormError } from "../../components/forms/FormError";
 
 export function LoginPage() {
   const { mutate: login, isPending, isError, error } = useLogin();
- const {
+  const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-  })
-
+  });
 
   const onSubmit = (data: LoginFormData) => {
-  login({ email: data.email, password: data.password });
-};
+    login({ email: data.email, password: data.password });
+  };
 
   return (
     <SplitAuthScreen
       panel={
         <div className="w-full">
           <div className="space-y-4">
-              <FeatureCard
-                icon={<Sparkles size={18} />}
-                title="AI-Powered RAG"
-                description="Ask questions, get answers grounded in your documents"
-                delay={0.1}
-              />
-              <FeatureCard
-                icon={<Zap size={18} />}
-                title="Instant Retrieval"
-                description="Sub-second semantic search across all your knowledge"
-                delay={0.25}
-              />
-              <FeatureCard
-                icon={<Shield size={18} />}
-                title="Enterprise Security"
-                description="SOC 2 compliant with end-to-end encryption"
-                delay={0.4}
-              />
-            </div>
+            <FeatureCard
+              icon={<Sparkles size={18} />}
+              title="AI-Powered RAG"
+              description="Ask questions, get answers grounded in your documents"
+              delay={0.1}
+            />
+            <FeatureCard
+              icon={<Zap size={18} />}
+              title="Instant Retrieval"
+              description="Sub-second semantic search across all your knowledge"
+              delay={0.25}
+            />
+            <FeatureCard
+              icon={<Shield size={18} />}
+              title="Enterprise Security"
+              description="SOC 2 compliant with end-to-end encryption"
+              delay={0.4}
+            />
+          </div>
           <div className="mt-6 inline-block bg-white/10 text-slate-200 text-xs px-4 py-1.5 rounded-full">
             Trusted by 12,000+ knowledge workers
           </div>
@@ -64,18 +63,23 @@ export function LoginPage() {
       <Logo />
 
       <h1 className="text-2xl font-bold text-slate-900 mt-6">Welcome back</h1>
-      <p className="text-slate-500 text-sm mt-1">Sign in to your knowledge workspace</p>
+      <p className="text-slate-500 text-sm mt-1">
+        Sign in to your knowledge workspace
+      </p>
 
       <div className="mt-6">
-        <GoogleButton onClick={() => console.log("Google OAuth - wired Day 3")} />
+        <GoogleButton
+          onClick={() => console.log("Google OAuth - wired Day 3")}
+        />
         <Divider text="or continue with email" />
-          {isError && (
-            <FormError
-              message={
-                (error as any)?.response?.data?.message || "Invalid email or password"
-              }
-            />
-          )}
+        {isError && (
+          <FormError
+            message={
+              (error as any)?.response?.data?.message ||
+              "Invalid email or password"
+            }
+          />
+        )}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormField
             label="Email address"
@@ -94,7 +98,10 @@ export function LoginPage() {
 
           <div className="flex items-center justify-between mb-5">
             <Checkbox label="Remember me" {...register("rememberMe")} />
-            <Link to="/forgot-password" className="text-sm text-indigo-600 font-medium">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-indigo-600 font-medium"
+            >
               Forgot password?
             </Link>
           </div>

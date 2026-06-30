@@ -6,7 +6,10 @@ import { useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 
 const pageMeta: Record<string, { title: string; icon: ReactNode }> = {
-  "/dashboard": { title: "Dashboard", icon: <Zap size={16} className="text-yellow-500" /> },
+  "/dashboard": {
+    title: "Dashboard",
+    icon: <Zap size={16} className="text-yellow-500" />,
+  },
   "/documents": { title: "Documents", icon: <></> },
   "/workspaces": { title: "Workspaces", icon: <></> },
 };

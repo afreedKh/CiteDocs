@@ -11,5 +11,6 @@ export const errorHandler = (
   return res.status(error.statusCode || 500).json({
     success: false,
     message: error.message || "Something went wrong",
+    ...(error.requiresVerification ? { requiresVerification: true } : {}),
   });
 };

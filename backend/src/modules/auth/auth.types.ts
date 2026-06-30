@@ -16,13 +16,13 @@ export interface VerifySignupOtpType {
 
 export interface VerifyLoginOtpType extends VerifySignupOtpType {}
 
-export interface ForgotPasswordType {
+export interface ForgotPasswordDTO {
   email: string;
 }
 
-export interface VerifyForgotPasswordOTPType extends VerifySignupOtpType {}
+export interface VerifyForgotPasswordOtpType extends VerifySignupOtpType {}
 
-export interface ResetPasswordType {
+export interface ResetPasswordDTO {
   resetToken: string;
   newPassword: string;
 }

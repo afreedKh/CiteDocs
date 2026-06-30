@@ -26,3 +26,14 @@ export const verifyUserEmail = async (userId: string) => {
     { new: true },
   );
 };
+
+export const updateUserPassword = async (
+  userId: string,
+  hashedPassword: string,
+) => {
+  return await User.findByIdAndUpdate(
+    userId,
+    { password: hashedPassword },
+    { new: true },
+  );
+};

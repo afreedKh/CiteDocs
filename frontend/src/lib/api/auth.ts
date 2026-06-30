@@ -6,11 +6,18 @@ export interface AuthUser {
   email: string;
 }
 
-export interface AuthResponse {
+export interface PendingAuthResponse {
   id: string;
   fullName: string;
   email: string;
-  token: string; 
+}
+
+export interface VerifiedAuthResponse {
+  id: string;
+  fullName: string;
+  email: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface LoginPayload {
@@ -24,13 +31,89 @@ export interface SignupPayload {
   password: string;
 }
 
-export async function loginApi(payload: LoginPayload): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>("/auth/login", payload);
+export interface VerifyOtpPayload {
+  email: string;
+  otp: string;
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  resetToken: string;
+  newPassword: string;
+}
+
+// Signup/login only trigger an OTP email — no session yet.
+export async function signupApi(
+  payload: SignupPayload,
+): Promise<PendingAuthResponse> {
+  const { data } = await apiClient.post<PendingAuthResponse>(
+    "/auth/register",
+    payload,
+  );
   return data;
 }
 
-export async function signupApi(payload: SignupPayload): Promise<AuthResponse> {
-  const { data } = await apiClient.post<AuthResponse>("/auth/register", payload);
+export async function loginApi(
+  payload: LoginPayload,
+): Promise<PendingAuthResponse> {
+  const { data } = await apiClient.post<PendingAuthResponse>(
+    "/auth/login",
+    payload,
+  );
+  return data;
+}
+
+// These are the only calls that actually return tokens.
+export async function verifySignupOtpApi(
+  payload: VerifyOtpPayload,
+): Promise<VerifiedAuthResponse> {
+  const { data } = await apiClient.post<VerifiedAuthResponse>(
+    "/auth/signup/verify",
+    payload,
+  );
+  return data;
+}
+
+export async function verifyLoginOtpApi(
+  payload: VerifyOtpPayload,
+): Promise<VerifiedAuthResponse> {
+  const { data } = await apiClient.post<VerifiedAuthResponse>(
+    "/auth/login/verify",
+    payload,
+  );
+  return data;
+}
+
+export async function forgotPasswordApi(
+  payload: ForgotPasswordPayload,
+): Promise<{ message: string }> {
+  const { data } = await apiClient.post<{ message: string }>(
+    "/auth/forgot-password",
+    payload,
+  );
+  return data;
+}
+
+export async function verifyForgotPasswordOtpApi(
+  payload: VerifyOtpPayload,
+): Promise<{ resetToken: string }> {
+  const { data } = await apiClient.post<{ resetToken: string }>(
+    "/auth/forgot-password/verify",
+    payload,
+  );
+  return data;
+}
+
+export async function resetPasswordApi(
+  payload: ResetPasswordPayload,
+): Promise<{ message: string }> {
+  const { data } = await apiClient.post<{ message: string }>(
+    "/auth/reset-password",
+    payload,
+  );
   return data;
 }
 

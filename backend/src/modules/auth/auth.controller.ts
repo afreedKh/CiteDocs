@@ -18,9 +18,11 @@ export const registerController = async (
     const user = await registerService(req.body);
 
     res.status(201).json({
+      success: true,
       id: user.id,
       fullName: user.fullName,
       email: user.email,
+      message: user.message,
     });
   } catch (error) {
     next(error);
@@ -36,6 +38,7 @@ export const loginController = async (
     const user = await loginService(req.body);
 
     res.json({
+      success: true,
       id: user.id,
       fullName: user.fullName,
       email: user.email,
@@ -119,6 +122,7 @@ export const resetPasswordController = async (
 ) => {
   try {
     await resetPasswordService(req.body);
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     next(error);
   }

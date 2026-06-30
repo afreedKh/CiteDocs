@@ -9,14 +9,15 @@ import { generateAndSendOTP, verifyOtp } from "../otp/otp.service";
 import {
   findUserByEmail,
   saveNewUser,
+  updateUserPassword,
   verifyUserEmail,
 } from "./auth.repository";
 import {
-  ForgotPasswordType,
+  ForgotPasswordDTO,
   LoginDTO,
   RegisterDTO,
-  ResetPasswordType,
-  VerifyForgotPasswordOTPType,
+  ResetPasswordDTO,
+  VerifyForgotPasswordOtpType,
   VerifyLoginOtpType,
   VerifySignupOtpType,
 } from "./auth.types";
@@ -27,13 +28,42 @@ const authError = (message: string) => {
   return err;
 };
 
-export const registerService = async (payload: RegisterDTO) => {
-  const userExists = await findUserByEmail(payload.email);
+const verificationRequiredError = (message: string) => {
+  const err: any = new Error(message);
+  err.statusCode = 403;
+  err.requiresVerification = true;
+  return err;
+};
 
-  if (userExists) {
-    throw authError("Email already exist");
+export const registerService = async (payload: RegisterDTO) => {
+  const existingUser = await findUserByEmail(payload.email);
+
+  // Case 3 — already registered and verified.
+  if (existingUser && existingUser.isEmailVerified) {
+    throw authError("Email already registered.");
   }
 
+  // Case 2 — exists but never verified: reuse the account, just resend the OTP.
+  if (existingUser && !existingUser.isEmailVerified) {
+    const otpSent = await generateAndSendOTP({
+      userId: existingUser._id,
+      email: existingUser.email,
+      purpose: "signup",
+    });
+
+    if (!otpSent) {
+      throw authError("Otp sent failed");
+    }
+
+    return {
+      id: existingUser._id,
+      fullName: existingUser.fullName,
+      email: existingUser.email,
+      message: "A new verification code has been sent to your email.",
+    };
+  }
+
+  // Case 1 — brand new user.
   const hashedPassword = await hashPassword(payload.password);
 
   const user = await saveNewUser(payload, hashedPassword);
@@ -52,6 +82,7 @@ export const registerService = async (payload: RegisterDTO) => {
     id: user._id,
     fullName: user.fullName,
     email: user.email,
+    message: "Verification code sent to your email.",
   };
 };
 
@@ -62,14 +93,26 @@ export const loginService = async (payload: LoginDTO) => {
     throw authError("Invalid email or password");
   }
 
-  if (!user.isEmailVerified) {
-    throw authError("Please verify your email first");
-  }
-
   const isMatch = await comparePassword(payload.password, user.password);
 
   if (!isMatch) {
     throw authError("Invalid email or password");
+  }
+
+  if (!user.isEmailVerified) {
+    const otpSent = await generateAndSendOTP({
+      userId: user._id,
+      email: user.email,
+      purpose: "signup",
+    });
+
+    if (!otpSent) {
+      throw authError("Otp sent failed");
+    }
+
+    throw verificationRequiredError(
+      "Your email is not verified. A new verification code has been sent.",
+    );
   }
 
   const otpSent = await generateAndSendOTP({
@@ -140,8 +183,10 @@ export const verifyLoginOTP = async (payload: VerifyLoginOtpType) => {
   };
 };
 
-export const forgotPasswordService = async (payload: ForgotPasswordType) => {
+export const forgotPasswordService = async (payload: ForgotPasswordDTO) => {
   const user = await findUserByEmail(payload.email);
+
+  // Don't reveal whether the email exists — respond the same way either way.
   if (!user) {
     return true;
   }
@@ -160,7 +205,7 @@ export const forgotPasswordService = async (payload: ForgotPasswordType) => {
 };
 
 export const verifyForgotPasswordOTP = async (
-  payload: VerifyForgotPasswordOTPType,
+  payload: VerifyForgotPasswordOtpType,
 ) => {
   const user = await findUserByEmail(payload.email);
 
@@ -179,6 +224,12 @@ export const verifyForgotPasswordOTP = async (
   return { resetToken };
 };
 
-export const resetPasswordService = async (payload: ResetPasswordType) => {
+export const resetPasswordService = async (payload: ResetPasswordDTO) => {
   const { id } = verifyResetToken(payload.resetToken);
+
+  const hashedPassword = await hashPassword(payload.newPassword);
+
+  await updateUserPassword(id, hashedPassword);
+
+  return true;
 };

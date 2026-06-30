@@ -9,7 +9,10 @@ import { GoogleButton } from "../../components/common/GoogleButton";
 import { Divider } from "../../components/common/Divider";
 import { FormField } from "../../components/forms/FormField";
 import { PasswordInput } from "../../components/forms/PasswordInput";
-import { signupSchema, type SignupFormData } from "../../lib/validation/authSchemas";
+import {
+  signupSchema,
+  type SignupFormData,
+} from "../../lib/validation/authSchemas";
 import { Link } from "react-router-dom";
 import { useSignup } from "../../lib/hooks/useAuth";
 import { FormError } from "../../components/forms/FormError";
@@ -20,19 +23,19 @@ export function SignupPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors},
+    formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
   // Stub submit — real API call comes Day 3
   const onSubmit = (data: SignupFormData) => {
-  signup({
-    fullName: data.fullName,
-    email: data.email,
-    password: data.password,
-  });
-};
+    signup({
+      fullName: data.fullName,
+      email: data.email,
+      password: data.password,
+    });
+  };
 
   return (
     <SplitAuthScreen
@@ -42,30 +45,40 @@ export function SignupPage() {
             Your second brain, powered by AI
           </h2>
           <p className="text-slate-400 mt-4 max-w-sm">
-            Upload documents, ask questions, and let CiteDocs surface the knowledge you need — instantly.
+            Upload documents, ask questions, and let CiteDocs surface the
+            knowledge you need — instantly.
           </p>
           <div className="mt-8">
             <AvatarStack />
-            <p className="text-slate-400 text-sm mt-3">Join 12,000+ teams already using CiteDocs</p>
+            <p className="text-slate-400 text-sm mt-3">
+              Join 12,000+ teams already using CiteDocs
+            </p>
           </div>
         </div>
       }
     >
       <Logo />
 
-      <h1 className="text-2xl font-bold text-slate-900 mt-6">Create your workspace</h1>
-      <p className="text-slate-500 text-sm mt-1">Start organizing your knowledge with AI</p>
+      <h1 className="text-2xl font-bold text-slate-900 mt-6">
+        Create your workspace
+      </h1>
+      <p className="text-slate-500 text-sm mt-1">
+        Start organizing your knowledge with AI
+      </p>
 
       <div className="mt-6">
-        <GoogleButton onClick={() => console.log("Google OAuth - wired Day 3")} />
+        <GoogleButton
+          onClick={() => console.log("Google OAuth - wired Day 3")}
+        />
         <Divider text="or sign up with email" />
         {isError && (
-            <FormError
-              message={
-                (error as any)?.response?.data?.message || "Something went wrong. Please try again."
-              }
-            />
-          )}
+          <FormError
+            message={
+              (error as any)?.response?.data?.message ||
+              "Something went wrong. Please try again."
+            }
+          />
+        )}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <FormField
             label="Full name"
