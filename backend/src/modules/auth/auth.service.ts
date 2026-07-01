@@ -93,7 +93,13 @@ export const loginService = async (payload: LoginDTO) => {
     throw authError("Invalid email or password");
   }
 
-  const isMatch = await comparePassword(payload.password, user.password);
+  if (user.provider === "google") {
+  throw authError(
+    "This account uses Google Sign-In. Please continue with Google."
+  );
+}
+
+  const isMatch = await comparePassword(payload.password, user.password!);
 
   if (!isMatch) {
     throw authError("Invalid email or password");

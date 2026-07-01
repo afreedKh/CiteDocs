@@ -117,6 +117,10 @@ export async function resetPasswordApi(
   return data;
 }
 
-export async function logoutApi(): Promise<void> {
-  await apiClient.post("/auth/logout");
-}
+export const googleLoginApi = async (idToken: string) => {
+  const response = await apiClient.post("/auth/google", {
+    idToken,
+  });
+
+  return response.data;
+};

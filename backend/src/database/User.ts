@@ -3,8 +3,11 @@ import mongoose, { Document } from "mongoose";
 export interface IUser extends Document {
   fullName: string;
   email: string;
-  password: string;
+  password?: string ;
   isEmailVerified: boolean;
+  provider: "local" | "google";
+  googleId?:string;
+  profilePicture?:string;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -20,12 +23,27 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     password: {
       type: String,
-      required: true,
+      required: function () {
+        return this.provider === "local";
+      },
     },
     isEmailVerified:{
       type: Boolean,
       default: false
-    }
+    },
+    provider:{
+      type:String,
+      enum:["local","google"],
+      default:"local"
+    },
+    googleId:{
+      type:String,
+      default:null
+    },
+    profilePicture:{
+      type:String,
+      default:null
+    },
   },
   {
     timestamps: true,

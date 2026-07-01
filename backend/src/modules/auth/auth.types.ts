@@ -26,3 +26,19 @@ export interface ResetPasswordDTO {
   resetToken: string;
   newPassword: string;
 }
+
+export interface GoogleUserType {
+  fullName: string;
+  email: string;
+  googleId: string;
+  profilePicture?: string;
+  provider: "google";
+  isEmailVerified: boolean;
+}
+
+export interface UpdateGoogleUserType {
+  googleId: string;
+  profilePicture?: string;
+  provider: "google";
+  isEmailVerified: boolean;
+}

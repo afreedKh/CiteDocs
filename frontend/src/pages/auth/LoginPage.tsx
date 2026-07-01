@@ -5,7 +5,6 @@ import { Mail, Sparkles, Zap, Shield } from "lucide-react";
 import { SplitAuthScreen } from "../../components/layout/SplitAuthScreen";
 import { FeatureCard } from "../../components/layout/FeatureCard";
 import { Logo } from "../../components/common/Logo";
-import { GoogleButton } from "../../components/common/GoogleButton";
 import { Divider } from "../../components/common/Divider";
 import { FormField } from "../../components/forms/FormField";
 import { PasswordInput } from "../../components/forms/PasswordInput";
@@ -15,9 +14,13 @@ import type { LoginFormData } from "../../lib/validation/authSchemas";
 import { Link } from "react-router-dom";
 import { useLogin } from "../../lib/hooks/useAuth";
 import { FormError } from "../../components/forms/FormError";
+import { GoogleLogin } from "@react-oauth/google";
+import { useGoogleAuth } from "../../lib/hooks/useAuth";
+
 
 export function LoginPage() {
   const { mutate: login, isPending, isError, error } = useLogin();
+  const { mutate: googleSignIn } = useGoogleAuth();
   const {
     register,
     handleSubmit,
@@ -68,8 +71,15 @@ export function LoginPage() {
       </p>
 
       <div className="mt-6">
-        <GoogleButton
-          onClick={() => console.log("Google OAuth - wired Day 3")}
+        <GoogleLogin
+          onSuccess={(credentialResponse) => {
+            if (!credentialResponse.credential) return;
+
+            googleSignIn(credentialResponse.credential);
+          }}
+          onError={() => {
+            console.log("Google Login Failed");
+          }}
         />
         <Divider text="or continue with email" />
         {isError && (

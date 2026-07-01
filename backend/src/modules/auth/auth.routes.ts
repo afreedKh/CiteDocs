@@ -8,6 +8,7 @@ import {
   verifyLoginOTPController,
   verifySignupOTPController,
 } from "./auth.controller";
+import { googleLoginController } from "./google.controller";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.post("/login/verify", verifyLoginOTPController);
 router.post("/forgot-password", forgotPasswordController);
 router.post("/forgot-password/verify", verifyForgotPasswordOTPController);
 router.post("/reset-password", resetPasswordController);
+router.post("/google", googleLoginController);
 
 export default router;

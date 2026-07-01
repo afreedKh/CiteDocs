@@ -1,5 +1,5 @@
 import User from "../../database/User";
-import { RegisterDTO } from "./auth.types";
+import { GoogleUserType, RegisterDTO, UpdateGoogleUserType } from "./auth.types";
 
 export const findUserByEmail = async (email: string) => {
   const user = await User.findOne({ email });
@@ -37,3 +37,13 @@ export const updateUserPassword = async (
     { new: true },
   );
 };
+
+
+export const createGoogleUser = async(payload:GoogleUserType)=>{
+  
+  return await new User(payload).save();
+}
+
+export const updateGoogleUser = async(userId:string,payload:UpdateGoogleUserType)=>{
+  return await User.findByIdAndUpdate(userId, payload, {new:true});
+}

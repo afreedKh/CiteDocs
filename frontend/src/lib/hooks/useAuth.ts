@@ -2,8 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   forgotPasswordApi,
+  googleLoginApi,
   loginApi,
-  logoutApi,
   resetPasswordApi,
   signupApi,
   verifyForgotPasswordOtpApi,
@@ -44,9 +44,6 @@ export function useLogin() {
       navigate("/verify-otp");
     },
     onError: (error: any, variables) => {
-      // Account exists + password correct, but email was never verified.
-      // The backend already resent a signup OTP — just route the user
-      // to verification instead of leaving them stuck on a dead-end error.
       if (error?.response?.data?.requiresVerification) {
         setPendingAuth({ email: variables.email, purpose: "signup" });
         navigate("/verify-otp");
@@ -143,10 +140,33 @@ export function useLogout() {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: logoutApi,
     onSettled: () => {
       clearAuth();
       navigate("/login");
     },
   });
 }
+
+export const useGoogleAuth = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (idToken: string) =>
+      googleLoginApi(idToken),
+
+    onSuccess: (data) => {
+
+      useAuthStore.getState().setAuth(
+        data.user,
+        data.accessToken,
+        data.refreshToken
+      );
+
+      navigate("/dashboard");
+    },
+
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+};
